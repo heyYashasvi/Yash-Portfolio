@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yash | Phone in hand. Cinema on screen.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08171D;--bg2:#0E252D;--ink:#F3EBDD;--mute:#8FA7AD;--teal:#20B2AA;--org:#FF7A2F;--line:#1E3941;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.55;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--org);outline-offset:3px}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:13px;letter-spacing:.04em}
+h1,h2,h3{font-family:'Syne',system-ui,sans-serif;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+
+/* progress timeline */
+#bar{position:fixed;left:0;top:0;height:4px;width:0;background:linear-gradient(90deg,var(--teal),var(--org));z-index:50}
+#tc2{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:50;background:rgba(8,23,29,.8);border:1px solid var(--line);padding:6px 10px;border-radius:8px;color:var(--ink)}
+
+/* HERO viewfinder */
+.hero{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center;cursor:crosshair;
+background:linear-gradient(170deg,#0B3C49 0%,#1B6F73 34%,#E58A4B 74%,#FF7A2F 100%);background-size:100% 160%;animation:sky 14s ease-in-out infinite alternate}
+@keyframes sky{to{background-position:0 100%}}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 33.2%,rgba(255,255,255,.14) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.14) 66.6%,transparent 66.8%),linear-gradient(90deg,transparent 33.2%,rgba(255,255,255,.14) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.14) 66.6%,transparent 66.8%);pointer-events:none}
+.hero:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.55));pointer-events:none}
+.hero .in{position:relative;z-index:2;padding:110px 20px 90px;width:100%;max-width:1100px;margin:0 auto}
+.hero h1{font-size:clamp(46px,12.5vw,132px);line-height:.92;letter-spacing:-.035em;font-weight:800;text-shadow:0 4px 40px rgba(0,0,0,.35)}
+.hero h1 span{display:block;overflow:hidden}
+.hero h1 span i{display:block;font-style:normal;animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
+.hero h1 span:nth-child(2) i{animation-delay:.25s}
+@keyframes rise{from{transform:translateY(105%)}}
+.hero p{max-width:46ch;font-size:clamp(17px,2.4vw,21px);margin:22px 0 0;text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.corner{position:absolute;width:34px;height:34px;border:3px solid rgba(255,255,255,.9);z-index:3}
+.c1{left:16px;top:calc(16px + env(safe-area-inset-top,0px));border-right:0;border-bottom:0}
+.c2{right:16px;top:calc(16px + env(safe-area-inset-top,0px));border-left:0;border-bottom:0}
+.c3{left:16px;bottom:16px;border-right:0;border-top:0}
+.c4{right:16px;bottom:16px;border-left:0;border-top:0}
+.hud{position:absolute;z-index:3;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.hud.tl{left:64px;top:calc(24px + env(safe-area-inset-top,0px))}
+.hud.tr{right:64px;top:calc(24px + env(safe-area-inset-top,0px))}
+.hud.bc{left:0;right:0;bottom:24px;text-align:center}
+.rec{display:inline-block;width:11px;height:11px;border-radius:50%;background:#FF3B30;margin-right:8px;animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+#ret{position:absolute;z-index:3;width:74px;height:74px;border:2px solid #FFD84A;left:50%;top:60%;margin:-37px 0 0 -37px;pointer-events:none;transition:left .25s,top .25s,transform .2s}
+#ret.lock{transform:scale(.8);border-color:#7CFF6B}
+#ret:after{content:"AF";position:absolute;left:0;bottom:-20px;font:700 11px ui-monospace,monospace;color:#FFD84A}
+#ret.lock:after{content:"AF-L";color:#7CFF6B}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-block;padding:15px 24px;border-radius:999px;font-weight:700;text-decoration:none;background:var(--ink);color:#08171D;border:2px solid var(--ink)}
+.btn.g{background:rgba(8,23,29,.35);color:#fff;border-color:rgba(255,255,255,.7);backdrop-filter:blur(6px)}
+
+section{padding:88px 0}
+.k{color:var(--org);margin-bottom:10px;display:block}
+h2{font-size:clamp(32px,6.5vw,64px);line-height:1;letter-spacing:-.03em;font-weight:800;max-width:16ch}
+.lead{color:var(--mute);max-width:54ch;margin:16px 0 32px;font-size:18px}
+
+/* GRADE slider */
+
+
+.grade{
+  position:relative;
+  aspect-ratio:1200/1320;
+  height:auto;
+  min-height:0;
+  border-radius:18px;
+  overflow:hidden;
+  touch-action:pan-y;
+  user-select:none;
+  border:1px solid var(--line);
+  background:#08171D;
+}
+
+/* Both images */
+.grade img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  object-position:center;
+  background:#08171D;
+}
+
+/* RAW / LOG image */
+#flat{
+  filter:grayscale(.75) contrast(.55) brightness(1.25);
+}
+
+/* Graded image */
+#gr{
+  clip-path:inset(0 calc(100% - var(--p,50%)) 0 0);
+}
+
+/* Slider line */
+#hd{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:var(--p,50%);
+  width:3px;
+  background:#fff;
+  transform:translateX(-50%);
+  z-index:4;
+}
+
+/* Slider circle */
+#hd:after{
+  content:"\2194";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:#fff;
+  color:#08171D;
+  display:grid;
+  place-items:center;
+  font-size:20px;
+  font-weight:700;
+}
+
+.tag{
+  position:absolute;
+  top:12px;
+  z-index:5;
+  background:rgba(8,23,29,.75);
+  padding:5px 10px;
+  border-radius:6px;
+}
+
+.tag.l{
+  left:12px;
+}
+
+.tag.r{
+  right:12px;
+}
+
+/* Invisible slider */
+#rng{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:ew-resize;
+  z-index:6;
+  margin:0;
+}
+
+/* FILM STRIP */
+.strip{background:#000;padding:26px 0;position:relative;margin:0 -20px}
+.strip:before,.strip:after{content:"";position:absolute;left:0;right:0;height:12px;background:repeating-linear-gradient(90deg,transparent 0 10px,#2b2b2b 10px 26px,transparent 26px 36px)}
+.strip:before{top:7px}.strip:after{bottom:7px}
+.reel{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 20px;scrollbar-width:thin}
+.fr{flex:0 0 min(62vw,230px);scroll-snap-align:center;text-decoration:none;position:relative}
+.fr .pic{aspect-ratio:9/16;border-radius:6px;display:grid;place-items:center;font-size:44px;color:rgba(255,255,255,.9);position:relative;overflow:hidden;transition:transform .25s}
+.fr .pic:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.75))}
+.fr:hover .pic{transform:scale(1.03)}
+.fr .cap{position:absolute;left:12px;right:12px;bottom:12px;z-index:2}
+.fr b{display:block;font-family:'Syne',sans-serif;font-size:18px}
+.fr .mono{color:#cbd8db}
+.hint{color:var(--mute);margin-top:14px}
+
+/* SHOT LIST */
+.row{display:grid;grid-template-columns:1fr;gap:6px;padding:26px 0;border-top:1px solid var(--line);transition:padding .25s,background .25s}
+.row:last-child{border-bottom:1px solid var(--line)}
+.row h3{font-size:clamp(26px,5vw,46px);letter-spacing:-.02em}
+.row p{margin:0;color:var(--mute);max-width:52ch}
+@media(min-width:760px){.row{grid-template-columns:1.1fr 1fr;align-items:center;gap:30px}.row:hover{padding-left:18px;background:linear-gradient(90deg,rgba(255,122,47,.12),transparent)}}
+
+/* CLAPPER */
+.clap{max-width:720px;margin:0 auto;border:3px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--bg2)}
+.arm{height:46px;background:repeating-linear-gradient(115deg,var(--ink) 0 34px,#08171D 34px 68px);transform-origin:0 100%;transition:transform .18s;border-bottom:3px solid var(--ink)}
+.clap.open .arm{transform:rotate(-14deg)}
+.clap .body{padding:26px 22px}
+.f{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);align-items:baseline}
+.f span{color:var(--mute)}
+.f b{font-size:18px;font-weight:500}
+.clap h2{font-size:clamp(28px,6vw,48px);margin:0 0 14px;max-width:none}
+footer{padding:36px 20px 80px;text-align:center;color:var(--mute)}
+@media(prefers-reduced-motion:reduce){.hero{animation:none}.hero h1 span i{animation:none}.rec{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="tc2" class="mono" aria-hidden="true">00:00:00:00</div>
+
+<header class="hero" id="hero">
+<i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+<div class="hud tl mono"><i class="rec"></i>REC <span id="tc">00:00:00:00</span></div>
+<div class="hud tr mono">4K &nbsp; 24 FPS &nbsp; LOG</div>
+<div id="ret"></div>
+<div class="in">
+<h1><span><i>Phone in hand.</i></span><span><i>Cinema on screen.</i></span></h1>
+<p>I am Yash, a videographer and editor. I shoot on a phone and grade it until nobody can tell. Reels, brand films and events for businesses that want to look bigger than they are.</p>
+<div class="btns">
+<a class="btn" href="#work">Watch the work</a>
+<a class="btn g" href="#contact">Book a shoot</a>
+</div>
+</div>
+<div class="hud bc mono">Tap anywhere to focus. Scroll to roll.</div>
+</header>
+
+<main class="wrap">
+<section id="grade">
+<span class="k mono">The edit</span>
+<h2>Same shot. Before and after.</h2>
+<p class="lead">Flat phone footage on the right, my colour grade on the left. Drag to see what editing does.</p>
+<div class="grade" id="gbox">
+<img id="flat" src="images/raw.png" alt="RAW / LOG">
+<img id="gr" src="images/graded.PNG" alt="Colour Graded">
+<span class="tag l mono">GRADED</span><span class="tag r mono">RAW / LOG</span>
+<div id="hd"></div>
+<input id="rng" type="range" min="0" max="100" value="50" aria-label="Compare graded and raw footage">
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E4F63"/><stop offset=".55" stop-color="#F08A4B"/><stop offset="1" stop-color="#FFC27A"/></linearGradient>
+<radialGradient id="sn"><stop offset="0" stop-color="#FFF3C9"/><stop offset=".4" stop-color="#FFD27A"/><stop offset="1" stop-color="#FFB05A" stop-opacity="0"/></radialGradient>
+<g id="scene"><rect width="800" height="450" fill="url(#sk)"/><circle cx="560" cy="250" r="150" fill="url(#sn)"/><circle cx="560" cy="250" r="42" fill="#FFF3C9"/>
+<path d="M0 300 L120 230 L230 290 L350 200 L480 300 L620 240 L800 310 V450 H0Z" fill="#1F6B73"/>
+<path d="M0 350 L150 300 L300 350 L470 290 L640 350 L800 320 V450 H0Z" fill="#0F3E47"/>
+<path d="M0 410 Q200 380 400 405 T800 400 V450 H0Z" fill="#071B21"/>
+<circle cx="250" cy="332" r="11" fill="#04151A"/><path d="M238 346 Q250 340 262 346 L268 396 H232Z" fill="#04151A"/>
+<rect x="246" y="392" width="8" height="18" fill="#04151A"/></g>
+</defs></svg>
+</section>
+
+<section id="work">
+<span class="k mono">Selected work</span>
+<h2>Roll the film.</h2>
+<p class="lead">Every frame below is a real reel. Tap one to watch it.</p>
+<div class="strip"><div class="reel" id="reel"></div></div>
+<p class="hint mono">Swipe sideways &rarr;</p>
+</section>
+
+<section id="services">
+<span class="k mono">The shot list</span>
+<h2>What I can shoot for you.</h2>
+<div style="margin-top:32px">
+<div class="row"><h3>Reels and shorts</h3><p>Hooks, pacing, sound and captions built for Instagram and YouTube Shorts.</p></div>
+<div class="row"><h3>Brand films</h3><p>Showrooms, shops and products shot to feel like an advertisement.</p></div>
+<div class="row"><h3>Weddings and events</h3><p>Highlight reels ready to post the same night.</p></div>
+<div class="row"><h3>Edit and colour grade</h3><p>Send me your footage. I cut, grade, mix sound and add subtitles.</p></div>
+</div>
+</section>
+
+<section id="contact">
+<div class="clap" id="clap">
+<div class="arm"></div>
+<div class="body">
+<h2>Ready when you are.</h2>
+<div class="f mono"><span>PROD.</span><b>Your project</b></div>
+<div class="f mono"><span>DIRECTOR</span><b>Yash</b></div>
+<div class="f mono"><span>BASE</span><b>Alwar, Rajasthan. Travels for shoots.</b></div>
+<div class="btns">
+<a class="btn" href="https://wa.me/917821006789" target="_blank" rel="noopener">WhatsApp me</a>
+<a class="btn g" href="https://instagram.com/theyash0004" target="_blank" rel="noopener">Instagram</a>
+<a class="btn g" href="mailto:business.yashu07@gmail.com">Email</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="mono">Shot on Iphone. Cut by Yash.</footer>
+
+<script>
+// EDIT HERE: apna kaam. t = title, k = type, u = video link, c = colours
+var works=[
+  {
+    t:"Musi Maharani",
+    k:"Alwar",
+    u:"images/musimaharani.mov",
+    c:"#20B2AA,#0B2F36"
+  },
+  {
+    t:"Haldi Ceremony",
+    k:"Wedding",
+    u:"images/haldi2.mov",
+    c:"#FF7A2F,#3A1A0C"
+  },
+  {
+    t:"Birthday",
+    k:"Event",
+    u:"images/birthday.mov",
+    c:"#7C5CFF,#1A1240"
+  },
+  {
+    t:"Sangeet Night",
+    k:"Wedding",
+    u:"images/sangeet.mov",
+    c:"#E5484D,#3B0F14"
+  },
+  {
+    t:"Musi Maharani in Monsoon",
+    k:"Alwar",
+    u:"images/musi.mov",
+    c:"#F5B942,#3A2606"
+  }
+];
+
+var r=document.getElementById('reel');
+
+works.forEach(function(w,i){
+
+  var a=document.createElement('a');
+  a.className='fr';
+  a.href='javascript:void(0)';
+  a.style.cursor='pointer';
+
+  var c=w.c.split(',');
+
+  a.innerHTML=
+    '<div class="pic" style="background:linear-gradient(160deg,'+c[0]+','+c[1]+')">'+
+      '&#9654;'+
+      '<div class="cap"><b></b><span class="mono"></span></div>'+
+    '</div>';
+
+  a.querySelector('b').textContent=w.t;
+  a.querySelector('.mono').textContent=w.k;
+
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+
+    var video=document.createElement('video');
+
+    video.src=w.u;
+    video.controls=true;
+    video.autoplay=true;
+    video.playsInline=true;
+
+    video.style.position='fixed';
+    video.style.top='0';
+    video.style.left='0';
+    video.style.width='100vw';
+    video.style.height='100vh';
+    video.style.objectFit='contain';
+    video.style.background='#000';
+    video.style.zIndex='99999';
+
+    document.body.appendChild(video);
+
+    video.play();
+
+    if(video.requestFullscreen){
+      video.requestFullscreen().catch(function(){});
+    }
+
+    video.addEventListener('ended',function(){
+      if(document.fullscreenElement){
+        document.exitFullscreen().catch(function(){});
+      }
+      video.remove();
+    });
+
+    document.addEventListener('fullscreenchange',function closeVideo(){
+      if(!document.fullscreenElement && video.parentNode){
+        video.pause();
+        video.remove();
+        document.removeEventListener('fullscreenchange',closeVideo);
+      }
+    });
+  });
+
+  r.appendChild(a);
+});
+function f2(n){return (n<10?'0':'')+n}
+function tc(ms){var s=Math.floor(ms/1000),fr=Math.floor((ms%1000)/1000*24);return '00:'+f2(Math.floor(s/60)%60)+':'+f2(s%60)+':'+f2(fr)}
+var t0=Date.now(),a1=document.getElementById('tc'),a2=document.getElementById('tc2'),bar=document.getElementById('bar');
+setInterval(function(){var s=tc(Date.now()-t0);a1.textContent=s;a2.textContent=s},80);
+addEventListener('scroll',function(){var h=document.documentElement,p=h.scrollTop/(h.scrollHeight-h.clientHeight||1);bar.style.width=(p*100)+'%'},{passive:true});
+var hero=document.getElementById('hero'),ret=document.getElementById('ret');
+hero.addEventListener('pointermove',function(e){var b=hero.getBoundingClientRect();ret.style.left=(e.clientX-b.left)+'px';ret.style.top=(e.clientY-b.top)+'px';ret.classList.remove('lock')});
+hero.addEventListener('click',function(e){if(e.target.closest('a'))return;var b=hero.getBoundingClientRect();ret.style.left=(e.clientX-b.left)+'px';ret.style.top=(e.clientY-b.top)+'px';ret.classList.add('lock');if(navigator.vibrate)navigator.vibrate(15)});
+var gb=document.getElementById('gbox'),rg=document.getElementById('rng');
+rg.addEventListener('input',function(){gb.style.setProperty('--p',rg.value+'%')});
+gb.style.setProperty('--p','50%');
+var cl=document.getElementById('clap');
+new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){cl.classList.add('open');setTimeout(function(){cl.classList.remove('open')},220)}})},{threshold:.6}).observe(cl);
+cl.addEventListener('click',function(e){if(e.target.closest('a'))return;cl.classList.add('open');setTimeout(function(){cl.classList.remove('open')},200)});
+</script>
+</body>
+</html>
